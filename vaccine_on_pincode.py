@@ -1,80 +1,171 @@
-
-""" 
-Developer: aipython on [29-05-2021]
-website: www.aipython.in
-
-Sends Notifications on a Telegram channel , whenever the Vaccine(s) is available at the given PINCODE 
-"""
-
+from discord import channel
+from discord.embeds import Embed
+import discord
+from discord.ext import *
+import os
+import random
+import string
+from discord.ext import commands
+from dotenv import load_dotenv
+from discord.ext import commands
 import requests
-from datetime import datetime, timedelta
-import time
-import pytz
-# from os import environ
+import sys
+import threading
+from discord.utils import get
+import discord
+import asyncio
+from threading import Thread
+import re
+import tracemalloc
+from fake_useragent import UserAgent
+tracemalloc.start()
 
-# Define all the constants
-time_interval = 10 # (in seconds) Specify the frequency of code execution
-PINCODE = "110028"
+# 1 if token random from txt 2 if token normal from txt
+typex = 2
 
-tele_auth_token = "1901486933:AAHed-MGB8hVwrmK4E-gvKTVd63XNkoxvPE" # Authentication token provided by Telegram bot
-tel_group_id = "test_Aug_vaccine"          # Telegram group name
-IST = pytz.timezone('Asia/Kolkata')        # Indian Standard Time - Timezone
-header = {'User-Agent': 'Chrome/84.0.4147.105 Safari/537.36'} # Header for using cowin api
-
-def update_timestamp_send_Request(PINCODE):
-    raw_TS = datetime.now(IST) + timedelta(days=1)      # Tomorrows date
-    tomorrow_date = raw_TS.strftime("%d-%m-%Y")         # Formatted Tomorrow's date
-    today_date = datetime.now(IST).strftime("%d-%m-%Y") #Current Date
-    curr_time = (datetime.now().strftime("%H:%M:%S"))   #Current time
-    request_link = f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode={PINCODE}&date={tomorrow_date}"
-    response = requests.get(request_link, headers = header)
-    raw_JSON = response.json()
-    return raw_JSON, today_date, curr_time
+#prefx
+prefxx = "."
+#token
+token = "OTQ2ODU4ODkwMDI3NDg3MzAy.Yhk1Dw.PF48LDRbAoVcSpVT2syiXe6_m3Y"
+#roles
+x1 = "basic"
+x2 = "vip"
+x3 = "megavip"
+x4 = "ultravip"
+#gen channel
+genchannel = 947171736514875454
 
 
-def get_availability_data():
-    slot_found_45 = False
-    slot_found_18 = False
-    
-    raw_JSON, today_date, curr_time = update_timestamp_send_Request(PINCODE)
-    print ("raw_JSON :" , raw_JSON)
-    
-    for cent in raw_JSON['centers']:
-        for sess in cent['sessions']:
-            sess_date = sess['date']
-            if sess['min_age_limit'] == 45 and sess['available_capacity'] > 0:
-                slot_found_45 =  True
-                msg = f"For age 45+ [Vaccine Available] at {PINCODE} on {sess_date}\n\tCenter : {cent['name']}\n\tVaccine: {sess['vaccine']}\n\tDose_1: {sess['available_capacity_dose1']}\n\tDose_2: {sess['available_capacity_dose2']}"
-                send_msg_on_telegram(msg)
-                print (f"INFO:[{curr_time}] Vaccine Found for 45+ at {PINCODE} >> Details sent on Telegram")
+
+
+
+load_dotenv()
+bot = commands.Bot(command_prefix=prefxx, help_command=None)
+
+def init():
+    loop = asyncio.get_event_loop()
+    loop.create_task(bot.run(token))
+    Thread(target=loop.run_forever).start()
+
+
+@bot.command()
+async def tfollow(ctx, arg):
+    if ctx.channel.id == genchannel:
+        
+        
+        role1 = discord.utils.get(ctx.guild.roles, name=x2)
+        role2 = discord.utils.get(ctx.guild.roles, name=x3)
+        role3 = discord.utils.get(ctx.guild.roles, name=x4)
+        
+        follow_count = 50
+        
+        if role1 in ctx.author.roles:
+            follow_count = follow_count + 200
+        elif role2 in ctx.author.roles:
+            follow_count = follow_count + 700
+        elif role3 in ctx.author.roles:
+            follow_count = follow_count + 1500
+            
+            
+
+        embed=discord.Embed()
+        embed.add_field(name=f"TWITCH FOLLOWS", value=f"Adding: ```{follow_count}``` follows to: ```{arg}``` ", inline=False)
+        await ctx.send(embed=embed)
+
+
+
+        def follow():
+            
+            if typex == 2:
                 
-            elif sess['min_age_limit'] == 18 and sess['available_capacity'] > 0:
-                slot_found_18 =  True
-                msg = f"For age 18+ [Vaccine Available] at {PINCODE} on {sess_date}\n\tCenter : {cent['name']}\n\tVaccine: {sess['vaccine']}\n\tDose_1: {sess['available_capacity_dose1']}\n\tDose_2: {sess['available_capacity_dose2']}"
-                send_msg_on_telegram(msg)
-                print (f"INFO: [{curr_time}] Vaccine Found for 18+ at {PINCODE} >> Details sent on Telegram")
+                class tokens:
+                    tokens = ''
+                
+                tokens.tokens = open('tokens.txt', 'r').read()
+                
+                
+                
+                for i in range(follow_count):
+                    
+                    token = tokens.tokens.partition('\n')[0]
+                    tokens.tokens = sansfirstline = '\n'.join(tokens.tokens.split('\n')[1:])
+                    
+                    
+                    ua = UserAgent()
+                    userAgent = ua.random
+
+                    headers = {
+                    'Client-ID': "ymd9sjdyrpi8kz8zfxkdf5du04m649",
+                    "Authorization": "OAuth wukbrnwp5f6uo4barxkzfpkacyugob",
+                    'Accept': 'application/vnd.twitchtv.v5+json'
+                        }
+
+                    url = f"https://api.twitch.tv/kraken/users?login={arg}"
+                    response = requests.get(url, headers=headers )
+
+
+                    start = response.text.find('_id":"') + 6
+                    end = response.text.find('",', start)
+                    id = response.text[start:end]
+                    print(id)
+                    user_agent = userAgent
+                    payload = '[{\"operationName\":\"FollowButton_FollowUser\",\"variables\":{\"input\":{\"disableNotifications\":false,\"targetID\":\"%s\"}},\"extensions\":{\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"51956f0c469f54e60211ea4e6a34b597d45c1c37b9664d4b62096a1ac03be9e6\"}}}]' % id
+                    url = 'https://gql.twitch.tv/gql'
+                    headers = {
+                    "Authorization": f"OAuth {token}",
+                    "Client-Id": 'kimne78kx3ncx6brgo4mv6wki5h1ko',
+                    "Content-Type": "application/json"
+                            }
+                    print(requests.post(url, data=payload, headers=headers).text)
+
+            elif typex == 1:
+
+                for i in range(follow_count):
+                
+                    lines = open('token.txt').read().splitlines()
+                    token =random.choice(lines)
+
+                    ua = UserAgent()
+                    userAgent = ua.random
+                    
+                    headers = {
+                    'Client-ID': "ymd9sjdyrpi8kz8zfxkdf5du04m649",
+                    "Authorization": "OAuth wukbrnwp5f6uo4barxkzfpkacyugob",
+                    'Accept': 'application/vnd.twitchtv.v5+json'
+                        }
+
+                    url = f"https://api.twitch.tv/kraken/users?login={arg}"
+                    response = requests.get(url, headers=headers )
+
+                    start = response.text.find('_id":"') + 6
+                    end = response.text.find('",', start)
+                    id = response.text[start:end]
+                    print(id)
+                    user_agent = userAgent
+                    payload = '[{\"operationName\":\"FollowButton_FollowUser\",\"variables\":{\"input\":{\"disableNotifications\":false,\"targetID\":\"%s\"}},\"extensions\":{\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"51956f0c469f54e60211ea4e6a34b597d45c1c37b9664d4b62096a1ac03be9e6\"}}}]' % id
+                    url = 'https://gql.twitch.tv/gql'
+                    headers = {
+                    "Authorization": f"OAuth {token}",
+                    "Client-Id": 'kimne78kx3ncx6brgo4mv6wki5h1ko',
+                    "Content-Type": "application/json"
+                            }
+                    print(requests.post(url, data=payload, headers=headers).text)
+
+                
+        threading.Thread(target=follow).start()
+
     
-    if slot_found_45 == False and slot_found_18 == False:
-        print (f"INFO: [{today_date}-{curr_time}] Vaccine NOT-available for 45+ at {PINCODE}")
-        print (f"INFO: [{today_date}-{curr_time}] Vaccine NOT-available for 18+ at {PINCODE}")
-    elif slot_found_45 == False:
-        print (f"INFO: [{today_date}-{curr_time}] Vaccine NOT-available for 45+ at {PINCODE}")
+  
     else:
-        print (f"INFO: [{today_date}-{curr_time}] Vaccine NOT-available for 18+ at {PINCODE}")
-    
-
-def send_msg_on_telegram(msg):
-    telegram_api_url = f"https://api.telegram.org/bot{tele_auth_token}/sendMessage?chat_id=@{tel_group_id}&text={msg}"
-    tel_resp = requests.get(telegram_api_url)
-
-    if tel_resp.status_code == 200:
-        print ("Notification has been sent on Telegram")
-    else:
-        print ("Could not send Message")
-
-
-if __name__ == "__main__":    
-    while True:
-        get_availability_data()
-        time.sleep(time_interval)
-
+        embed=discord.Embed(title="Use Correct Channel", description=f"Commands are only allowed on {genchannel}")
+        await ctx.send(embed=embed)
+        return
+        
+        
+@bot.command()
+async def help(ctx):
+    embed=discord.Embed(title="Help", description=f"""```.tfollow <user>``` twitch follows
+```.help```help command""")
+    await ctx.send(embed=embed)
+        
+init()
