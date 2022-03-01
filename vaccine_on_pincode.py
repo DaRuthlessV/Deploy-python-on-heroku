@@ -26,7 +26,7 @@ typex = 2
 #prefx
 prefxx = "."
 #token
-token = "OTQ2ODU4ODkwMDI3NDg3MzAy.Yhk1Dw.PF48LDRbAoVcSpVT2syiXe6_m3Y"
+token = "OTQ2ODU4ODkwMDI3NDg3MzAy.Yhk1Dw.u8g3QcmJUaeB_VtE2JrQScVme1I"
 #roles
 x1 = "basic"
 x2 = "vip"
